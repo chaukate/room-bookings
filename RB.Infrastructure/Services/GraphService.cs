@@ -1,13 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Graph;
+using RB.Application.Interfaces;
 
 namespace RB.Infrastructure.Services
 {
-    public class GraphService
+    public class GraphService : IGraphService
     {
+        public async Task CreateCalendarEventAsync(CancellationToken cancellationToken)
+        {
+            var graphClient = CreateGraphClient("");
 
+            var result = await graphClient.Me.Calendar.Events.PostAsync(new Microsoft.Graph.Models.Event(), cancellationToken: cancellationToken);
+        }
+
+        public GraphServiceClient CreateGraphClient(string tenantId)
+        {
+            //var graphClient = new GraphServiceClient(null);
+
+            return null;
+        }
     }
 }
