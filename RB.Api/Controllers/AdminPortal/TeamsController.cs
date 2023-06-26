@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RB.Application.Common.Exceptions;
 using RB.Application.Teams.Commands;
 using RB.Application.Teams.Queries;
 
-namespace RB.Api.Controllers
+namespace RB.Api.Controllers.AdminPortal
 {
+    [Route("api/admin-portal/[controller]")]
+    [Authorize(Policy = "Admin Portal Endpoint")]
     public class TeamsController : BaseController
     {
         [Produces("application/json")]

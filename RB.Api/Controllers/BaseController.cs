@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace RB.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public abstract class BaseController : ControllerBase
     {
