@@ -10,7 +10,7 @@ namespace RB.Domain.Entities
         public int BookedBy { get; set; }
         public int BookedFor { get; set; }
         public DateTimeOffset BookedAt { get; set; }
-        public string Description { get; set; } = "";
+        public string Description { get; set; }
 
         public virtual Member Member { get; set; } = new Member();
         public virtual Team Team { get; set; } = new Team();
