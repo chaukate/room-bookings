@@ -5,7 +5,7 @@ namespace RB.Api.Controllers
 {
     [Route("api/[controller]")]
     [Authorize(Policy = "Exchange Endpoint")]
-    public class AccountsControllerController : BaseController
+    public class AccountsController : BaseController
     {
         [Produces("aplication/json")]
         [HttpPost("authenticate")]
