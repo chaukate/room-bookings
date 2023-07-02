@@ -14,16 +14,16 @@ namespace RB.Application.Rooms.Queries
 
         public async Task<List<ListRoomsResponse>> Handle(ListRoomsQuery request, CancellationToken cancellationToken)
         {
-            var response = await _dbContext.Rooms.AsNoTracking()
-                                                 .Select(s => new ListRoomsResponse
-                                                 {
-                                                     Id = s.Id,
-                                                     Name = s.Name,
-                                                     IsActive = s.IsActive,
-                                                     LastUpdatedAt = s.LastUpdatedAt,
-                                                     LastUpdatedBy = s.LastUpdatedBy
-                                                 })
-                                                 .ToListAsync(cancellationToken);
+            var response = await _dbContext.Rooms
+                                           .Select(s => new ListRoomsResponse
+                                           {
+                                               Id = s.Id,
+                                               Name = s.Name,
+                                               IsActive = s.IsActive,
+                                               LastUpdatedAt = s.LastUpdatedAt,
+                                               LastUpdatedBy = s.LastUpdatedBy
+                                           })
+                                           .ToListAsync(cancellationToken);
 
             return response;
         }

@@ -1,3 +1,4 @@
+using Microsoft.Graph.Models.ExternalConnectors;
 using RB.Application;
 using RB.Infrastructure;
 
@@ -27,6 +28,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

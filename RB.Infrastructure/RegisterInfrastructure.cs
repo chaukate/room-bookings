@@ -28,6 +28,37 @@ namespace RB.Infrastructure
             services.Configure<AzureAdConfiguration>(AzureAdConfiguration.CLIENT_SECTION_NAME,
                                                      configuration.GetSection(clientSection));
 
+            services.AddCors(options =>
+            {
+                var section = configuration.GetSection(CorsConfiguration.SECTION_NAME);
+                var corsConfig = new CorsConfiguration();
+                section.Bind(corsConfig);
+
+#if DEBUG
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins(corsConfig.AllowedOrigins)
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+#endif
+
+                options.AddPolicy("ExposedHeader", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .WithMethods("GET")
+                           .AllowAnyHeader()
+                           .WithExposedHeaders(corsConfig.ExposedHeaders);
+                });
+
+                options.AddPolicy("PublicAccess", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
             services.AddDbContext<IRBDbContext, RBDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("RoomBooking"));
@@ -82,8 +113,8 @@ namespace RB.Infrastructure
                     policy.RequireAssertion(context =>
                     {
                         var userTenantId = context.User.Claims.FirstOrDefault(c => c.Type == ClaimConstants.TenantId)?.Value;
-                        var isApLogic = (userTenantId == aplTenantId);
-                        return isApLogic;
+                        var isValidTenant = (userTenantId == aplTenantId);
+                        return isValidTenant;
                     });
                 });
             });
