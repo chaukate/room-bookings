@@ -20,6 +20,7 @@ namespace RB.Application.Members.Queries
                                                        Id = s.Id,
                                                        Name = s.Name,
                                                        Email = s.Email,
+                                                       ImageUrl = s.SlackUserImage,
                                                        HasAccess = s.HasAccess,
                                                        IsActive = s.IsActive,
                                                        LastUpdatedAt = s.LastUpdatedAt,
@@ -38,6 +39,7 @@ namespace RB.Application.Members.Queries
         public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
+        public string ImageUrl { get; set; }
         public bool HasAccess { get; set; }
         public bool IsActive { get; set; }
         public DateTimeOffset LastUpdatedAt { get; set; }

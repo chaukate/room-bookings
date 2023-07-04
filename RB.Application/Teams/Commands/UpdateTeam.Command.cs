@@ -9,9 +9,12 @@ namespace RB.Application.Teams.Commands
     public class UpdateTeamHandler : IRequestHandler<UpdateTeamCommand>
     {
         private readonly IRBDbContext _dbContext;
-        public UpdateTeamHandler(IRBDbContext dbContext)
+        private readonly ISlackService _slackService;
+        public UpdateTeamHandler(IRBDbContext dbContext,
+                                 ISlackService slackService)
         {
             _dbContext = dbContext;
+            _slackService = slackService;
         }
 
         public async Task Handle(UpdateTeamCommand request, CancellationToken cancellationToken)
@@ -27,6 +30,38 @@ namespace RB.Application.Teams.Commands
                                                      cancellationToken))
             {
                 throw new BadRequestException($"{request.Name} is already registered.");
+            }
+
+            if (dbTeam.LeadId != request.LeadId)
+            {
+                var dbMember = await _dbContext.Members.FindAsync(request.LeadId);
+                if (dbMember == null)
+                {
+                    throw new BadRequestException("Invalid lead request.");
+                }
+
+                // TODO : Need to implement this in event
+                var slackUser = await _slackService.GetUserByEmailAsync(dbMember.Email, cancellationToken);
+                if (slackUser.Ok && slackUser.User != null)
+                {
+                    dbMember.SlackUserId = slackUser.User.Id;
+                    dbMember.SlackUserImage = slackUser.User.Profile.Image;
+                    dbMember.HasAccess = true;
+                    dbMember.LastUpdatedAt = DateTimeOffset.UtcNow;
+                    dbMember.LastUpdatedBy = request.CurrentUser;
+
+                    await _slackService.InviteMemberToChannelAsync(slackUser.User.Id, cancellationToken);
+                }
+
+                if (_dbContext.Teams.Count(c => c.LeadId == dbTeam.LeadId) <= 1)
+                {
+                    var dbOldMember = await _dbContext.Members.FindAsync(dbTeam.LeadId);
+                    await _slackService.RemoveMemberFromChannelAsync(dbOldMember.SlackUserId, cancellationToken);
+
+                    dbOldMember.HasAccess = false;
+                    dbOldMember.LastUpdatedAt = DateTimeOffset.UtcNow;
+                    dbOldMember.LastUpdatedBy = request.CurrentUser;
+                }
             }
 
             dbTeam.Name = request.Name;

@@ -16,7 +16,7 @@ namespace RB.Api.Controllers.AdminPortal
         [HttpGet]
         public async Task<IActionResult> ListAsync(CancellationToken cancellationToken)
         {
-            var query = new ListTeamsQuery();
+            var query = new ListMembersQuery();
             var response = await Mediator.Send(query, cancellationToken);
             return Ok(response);
         }

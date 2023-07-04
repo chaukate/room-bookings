@@ -1,17 +1,17 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace RB.Infrastructure.Common.Models
+namespace RB.Application.Common.Models
 {
-    public class SlackUserModel
+    public class SlackMembersModel
     {
         [JsonPropertyName("ok")]
         public bool Ok { get; set; }
 
         [JsonPropertyName("members")]
-        public List<Member> Members { get; set; }
+        public List<MemberModel> Members { get; set; }
     }
 
-    public class Member
+    public class MemberModel
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -23,10 +23,10 @@ namespace RB.Infrastructure.Common.Models
         public string RealName { get; set; }
 
         [JsonPropertyName("profile")]
-        public Profile Profile { get; set; }
+        public MemberProfileModel Profile { get; set; }
     }
 
-    public class Profile
+    public class MemberProfileModel
     {
         [JsonPropertyName("email")]
         public string Email { get; set; }

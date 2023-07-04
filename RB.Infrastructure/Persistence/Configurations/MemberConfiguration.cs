@@ -19,6 +19,16 @@ namespace RB.Infrastructure.Persistence.Configurations
             builder.HasIndex(h => h.Email)
                 .IsUnique();
 
+            builder.Property(p => p.SlackUserId)
+                .HasMaxLength(100)
+                .IsRequired(false);
+            builder.HasIndex(h => h.SlackUserId)
+                .IsUnique();
+
+            builder.Property(p => p.SlackUserImage)
+                .HasMaxLength(1000)
+                .IsRequired(false);
+
             builder.Property(p => p.IsActive);
         }
     }

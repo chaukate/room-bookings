@@ -11,12 +11,12 @@ namespace RB.Infrastructure.Persistence.Configurations
             base.Configure(builder);
 
             builder.HasOne(h => h.Team)
-                .WithMany()
+                .WithMany(w => w.TeamMembers)
                 .HasForeignKey(h => h.TeamId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(h => h.Member)
-                .WithMany()
+                .WithMany(w => w.MemberTeams)
                 .HasForeignKey(h => h.MemberId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
