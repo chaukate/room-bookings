@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using RB.Application.Interfaces;
-using RB.Infrastructure.Common;
+using RB.Infrastructure.Common.Configurations;
 
 namespace RB.Infrastructure.Services
 {

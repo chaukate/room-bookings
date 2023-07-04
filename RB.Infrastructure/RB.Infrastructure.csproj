@@ -15,6 +15,7 @@
     <PackageReference Include="Microsoft.Graph" Version="5.15.0" />
     <PackageReference Include="Microsoft.Identity.Web" Version="2.12.4" />
     <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="2.12.4" />
+    <PackageReference Include="Slack.NetStandard" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

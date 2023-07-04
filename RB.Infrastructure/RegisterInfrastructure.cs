@@ -4,8 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using RB.Application.Interfaces;
-using RB.Infrastructure.Common;
+using RB.Infrastructure.Common.Configurations;
 using RB.Infrastructure.Persistence;
+using RB.Infrastructure.Services;
 using System.Text;
 
 namespace RB.Infrastructure
@@ -27,6 +28,7 @@ namespace RB.Infrastructure
                                                      configuration.GetSection(adminSection));
             services.Configure<AzureAdConfiguration>(AzureAdConfiguration.CLIENT_SECTION_NAME,
                                                      configuration.GetSection(clientSection));
+            services.Configure<SlackConfiguration>(configuration.GetSection(SlackConfiguration.SECTION_NAME));
 
             services.AddCors(options =>
             {
@@ -118,6 +120,8 @@ namespace RB.Infrastructure
                     });
                 });
             });
+
+            services.AddScoped<ISlackService, SlackService>();
 
             return services;
         }

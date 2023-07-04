@@ -1,4 +1,4 @@
-﻿namespace RB.Infrastructure.Common
+﻿namespace RB.Infrastructure.Common.Configurations
 {
     public class CorsConfiguration
     {
