@@ -29,6 +29,7 @@ namespace RB.Infrastructure
             services.Configure<AzureAdConfiguration>(AzureAdConfiguration.CLIENT_SECTION_NAME,
                                                      configuration.GetSection(clientSection));
             services.Configure<SlackConfiguration>(configuration.GetSection(SlackConfiguration.SECTION_NAME));
+            services.Configure<GraphConfiguration>(configuration.GetSection(GraphConfiguration.SECTION_NAME));
 
             services.AddCors(options =>
             {
@@ -122,6 +123,8 @@ namespace RB.Infrastructure
             });
 
             services.AddScoped<ISlackService, SlackService>();
+            services.AddScoped<IGraphAdminService, GraphAdminService>();
+            services.AddScoped<IGraphEmailService, GraphEmailService>();
 
             return services;
         }

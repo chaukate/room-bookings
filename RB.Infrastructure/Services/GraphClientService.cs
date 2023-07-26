@@ -18,7 +18,7 @@ namespace RB.Infrastructure.Services
         {
             var graphClient = GetGraphClient("");
 
-            var result = await graphClient.Me.Calendar.Events.PostAsync(new Microsoft.Graph.Models.Event(), cancellationToken: cancellationToken);
+            //var result = await graphClient.Me.Calendar.Events.PostAsync(new Microsoft.Graph.Models.Event(), cancellationToken: cancellationToken);
         }
 
 

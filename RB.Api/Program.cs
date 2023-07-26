@@ -1,4 +1,3 @@
-using Microsoft.Graph.Models.ExternalConnectors;
 using RB.Application;
 using RB.Infrastructure;
 

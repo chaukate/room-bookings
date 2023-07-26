@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RB.Application.Common.Exceptions;
 using RB.Application.Interfaces;
 using RB.Domain.Entities;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace RB.Application.Teams.Commands
@@ -11,11 +12,14 @@ namespace RB.Application.Teams.Commands
     {
         private readonly IRBDbContext _dbContext;
         private readonly ISlackService _slackService;
+        private readonly IGraphEmailService _graphEmailService;
         public CreateTeamHandler(IRBDbContext dbContext,
-                                 ISlackService slackService)
+                                 ISlackService slackService,
+                                 IGraphEmailService graphEmailService)
         {
             _dbContext = dbContext;
             _slackService = slackService;
+            _graphEmailService = graphEmailService;
         }
 
         public async Task<int> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
@@ -41,17 +45,24 @@ namespace RB.Application.Teams.Commands
             };
 
             // TODO : Need to implement this in event
-            var slackUser = await _slackService.GetUserByEmailAsync(dbMember.Email, cancellationToken);
-            if (slackUser.Ok && slackUser.User != null)
+            if (string.IsNullOrEmpty(dbMember.SlackUserId) || !dbMember.HasAccess)
             {
-                dbMember.SlackUserId = slackUser.User.Id;
-                dbMember.SlackUserImage = slackUser.User.Profile.Image;
-                dbMember.HasAccess = true;
-                dbMember.LastUpdatedAt = DateTimeOffset.UtcNow;
-                dbMember.LastUpdatedBy = request.CurrentUser;
+                var slackUser = await _slackService.GetUserByEmailAsync(dbMember.Email, cancellationToken);
+                if (slackUser.Ok && slackUser.User != null)
+                {
+                    dbMember.SlackUserId = slackUser.User.Id;
+                    dbMember.SlackUserImage = slackUser.User.Profile.Image;
+                    dbMember.HasAccess = true;
+                    dbMember.LastUpdatedAt = DateTimeOffset.UtcNow;
+                    dbMember.LastUpdatedBy = request.CurrentUser;
 
-                await _slackService.InviteMemberToChannelAsync(slackUser.User.Id, cancellationToken);
+                    await _slackService.InviteMemberToChannelAsync(slackUser.User.Id, cancellationToken);
+                }
             }
+
+            //var content = new StringBuilder("You have been assigned to team ");
+            //content.AppendLine($"<b>{request.Name}</b>");
+            //await _graphEmailService.SendMailAsync(dbMember.Email, "Assigned To Team", content, cancellationToken);
 
             _dbContext.Teams.Add(team);
             await _dbContext.SaveChangesAsync(cancellationToken);
