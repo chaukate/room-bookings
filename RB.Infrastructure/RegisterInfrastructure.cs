@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
+using RB.Application.Common.Behaviours;
 using RB.Application.Interfaces;
 using RB.Infrastructure.Common.Configurations;
 using RB.Infrastructure.Persistence;
@@ -125,6 +127,8 @@ namespace RB.Infrastructure
             services.AddScoped<ISlackService, SlackService>();
             services.AddScoped<IGraphAdminService, GraphAdminService>();
             services.AddScoped<IGraphEmailService, GraphEmailService>();
+            services.AddScoped<IEventDispatcherService, EventDispatcherService>();
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(EventDispatcherBehavior<,>));
 
             return services;
         }

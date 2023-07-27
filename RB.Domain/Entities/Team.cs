@@ -1,6 +1,8 @@
-﻿namespace RB.Domain.Entities
+﻿using RB.Domain.Interfaces;
+
+namespace RB.Domain.Entities
 {
-    public class Team : BaseEntity
+    public class Team : BaseEntity, ICreatedEvent
     {
         public string Name { get; set; }
         public string Description { get; set; }
