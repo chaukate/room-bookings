@@ -1,6 +1,7 @@
 ﻿using Azure.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using Microsoft.Identity.Web;
 using RB.Application.Interfaces;
 using RB.Infrastructure.Common.Configurations;
@@ -23,11 +24,11 @@ namespace RB.Infrastructure.Services
 
         private async Task SendMail(Message message, bool saveToSentItems)
         {
-            // TODO : Use Token Acquirer TokenCredential
+            // TODO : Use Token Acquirer TokenCredential (TokenAcquirerTokenCredential)
             var credential = new TokenAcquisitionTokenCredential(_tokenAcquisition);
             var client = new GraphServiceClient(credential);
 
-            var requestBody = new SendMailPostRequestBody { Message = message, SaveToSentItems = saveToSentItems };
+            var requestBody = new Microsoft.Graph.Me.SendMail.SendMailPostRequestBody { Message = message, SaveToSentItems = saveToSentItems };
 
             await client.Me.SendMail.PostAsync(requestBody);
         }
@@ -60,9 +61,16 @@ namespace RB.Infrastructure.Services
                 ToRecipients = new List<Recipient> { new Recipient { EmailAddress = new EmailAddress { Address = recipent } } }
             };
 
-            await graphClient.Users[_graphConfiguration.AdminEmailId].SendMail(message)
-                                                                     .Request()
-                                                                     .PostAsync(cancellationToken);
+            var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
+            {
+                Message = message,
+                SaveToSentItems = true
+            };
+
+            await graphClient.Users[_graphConfiguration.AdminEmailId]
+                             .SendMail
+                             .PostAsync(requestBody,
+                                        cancellationToken: cancellationToken);
         }
     }
 }

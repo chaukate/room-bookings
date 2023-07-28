@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Azure.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using Microsoft.Identity.Web;
 using RB.Application.Interfaces;
 using RB.Infrastructure.Common.Configurations;
@@ -12,16 +14,10 @@ namespace RB.Infrastructure.Services
 {
     public class GraphEmailService : IGraphEmailService
     {
-        private readonly HttpClient _httpClient;
         private readonly ITokenAcquisition _tokenAcquisition;
-        private readonly GraphConfiguration _graphConfiguration;
-        public GraphEmailService(IHttpClientFactory httpClient,
-                                 ITokenAcquisition tokenAcquisition,
-                                 IOptions<GraphConfiguration> options)
+        public GraphEmailService(ITokenAcquisition tokenAcquisition)
         {
-            _httpClient = httpClient.CreateClient();
             _tokenAcquisition = tokenAcquisition;
-            _graphConfiguration = options.Value;
         }
 
         public async Task SendMailAsync(string recipent, string subject, StringBuilder content, CancellationToken cancellationToken)
@@ -33,27 +29,24 @@ namespace RB.Infrastructure.Services
                 ToRecipients = new List<Recipient> { new Recipient { EmailAddress = new EmailAddress { Address = recipent } } }
             };
 
-            await SendMailAsync(message, cancellationToken);
+            await SendMailAsync(message, true, cancellationToken);
         }
 
-        private async Task SendMailAsync(Message message, CancellationToken cancellationToken, bool isSaveToSaveItems = false)
+        private async Task SendMailAsync(Message message, bool saveToSentItems, CancellationToken cancellationToken)
         {
-            var token = await _tokenAcquisition.GetAccessTokenForUserAsync(new string[] { ".default" });
-            // make API call
-            var request = new HttpRequestMessage(HttpMethod.Post, $"{_graphConfiguration.Instance}me/sendMail");
-            request.Headers.Accept.Clear();
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            // TODO : Use Token Acquirer TokenCredential (TokenAcquirerTokenCredential)
+            var credential = new TokenAcquisitionTokenCredential(_tokenAcquisition);
+            var client = new GraphServiceClient(credential);
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var requestBody = new Microsoft.Graph.Me.SendMail.SendMailPostRequestBody { Message = message, SaveToSentItems = saveToSentItems };
 
-            var jsonContent = JsonSerializer.Serialize(new { message, isSaveToSaveItems });
-            request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            var apiResponse = await _httpClient.SendAsync(request, cancellationToken);
-            var data = await apiResponse.Content.ReadAsStringAsync();
-            if (!apiResponse.StatusCode.Equals(HttpStatusCode.Accepted))
+            try
             {
-                throw new Exception("Error sending mail.");
+                await client.Me.SendMail.PostAsync(requestBody, cancellationToken: cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
     }

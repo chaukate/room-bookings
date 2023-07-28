@@ -47,5 +47,14 @@ namespace RB.Application.Teams.Events
                 await _graphEmailService.SendMailAsync(lead.Email, "Assigned To Team", content, cancellationToken);
             }
         }
+
+        public async Task Handle(UpdatedEvent notification, CancellationToken cancellationToken)
+        {
+            var team = notification.GetEntity<Team>();
+            if (team != null)
+            {
+
+            }
+        }
     }
 }
