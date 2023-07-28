@@ -1,6 +1,7 @@
 ﻿using Azure.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
+using Microsoft.Identity.Web;
 using RB.Application.Interfaces;
 using RB.Infrastructure.Common.Configurations;
 
@@ -10,11 +11,25 @@ namespace RB.Infrastructure.Services
     {
         private readonly AzureAdConfiguration _adminConfiguration;
         private readonly GraphConfiguration _graphConfiguration;
+        private readonly ITokenAcquisition _tokenAcquisition;
         public GraphAdminService(IOptionsSnapshot<AzureAdConfiguration> optionsSnapshot,
-                                 IOptions<GraphConfiguration> options)
+                                 IOptions<GraphConfiguration> options,
+                                 ITokenAcquisition tokenAcquisition)
         {
             _adminConfiguration = optionsSnapshot.Get(AzureAdConfiguration.ADMIN_SECTION_NAME);
             _graphConfiguration = options.Value;
+            _tokenAcquisition = tokenAcquisition;
+        }
+
+        private async Task SendMail(Message message, bool saveToSentItems)
+        {
+            // TODO : Use Token Acquirer TokenCredential
+            var credential = new TokenAcquisitionTokenCredential(_tokenAcquisition);
+            var client = new GraphServiceClient(credential);
+
+            var requestBody = new SendMailPostRequestBody { Message = message, SaveToSentItems = saveToSentItems };
+
+            await client.Me.SendMail.PostAsync(requestBody);
         }
 
         private GraphServiceClient GetGraphClient()
