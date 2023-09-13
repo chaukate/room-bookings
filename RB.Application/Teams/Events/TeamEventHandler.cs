@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RB.Application.Teams.Events
 {
-    public class TeamEventHandler : INotificationHandler<CreatedEvent>
+    public class TeamEventHandler : INotificationHandler<CreatedEvent>, INotificationHandler<UpdatedEvent>
     {
         private readonly IRBDbContext _dbContext;
         private readonly ISlackService _slackService;

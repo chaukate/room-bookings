@@ -6,6 +6,7 @@ namespace RB.Application.Interfaces
     public interface IRBDbContext
     {
         DbSet<Booking> Bookings { get; set; }
+        DbSet<Client> Clients { get; set; }
         DbSet<Member> Members { get; set; }
         DbSet<Room> Rooms { get; set; }
         DbSet<Team> Teams { get; set; }
