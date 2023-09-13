@@ -4,13 +4,16 @@ using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Identity.Web;
 using RB.Application.Interfaces;
+using RB.Domain.Entities;
 using RB.Infrastructure.Common.Configurations;
+using System.Text;
 
 namespace RB.Infrastructure.Services
 {
     public class GraphAdminService : IGraphAdminService
     {
         private readonly AzureAdConfiguration _adminConfiguration;
+        private readonly AzureAdConfiguration _clientConfiguration;
         private readonly GraphConfiguration _graphConfiguration;
         private readonly ITokenAcquisition _tokenAcquisition;
         public GraphAdminService(IOptionsSnapshot<AzureAdConfiguration> optionsSnapshot,
@@ -18,8 +21,23 @@ namespace RB.Infrastructure.Services
                                  ITokenAcquisition tokenAcquisition)
         {
             _adminConfiguration = optionsSnapshot.Get(AzureAdConfiguration.ADMIN_SECTION_NAME);
+            _clientConfiguration = optionsSnapshot.Get(AzureAdConfiguration.CLIENT_SECTION_NAME);
             _graphConfiguration = options.Value;
             _tokenAcquisition = tokenAcquisition;
+        }
+
+        public async Task RequestConsentAsync(Client client, CancellationToken cancellationToken)
+        {
+            var consentUrl = new StringBuilder($"{_clientConfiguration.Instance}/organizations/v2.0/adminconsent");
+            consentUrl.Append($"?client_id={_clientConfiguration.ClientId}");
+            consentUrl.Append("&scope=.default");
+            consentUrl.Append($"&state={client.SecretKey}");
+            consentUrl.Append($"&return_uri={_clientConfiguration.ConsentReturnUri}");
+
+            var content = new StringBuilder("<p>Please, click below to provide your consent to allow access some criticial information.</p><br>");
+            content.Append($"<a href=\"{consentUrl}\" target=\"_blank\" rel=\"noopener noreferrer\">I would like to provide my consent.</a>");
+
+            await SendAdminEmailAsync(client.AdminEmail, "Application Consent Request", content.ToString(), cancellationToken);
         }
 
         private async Task SendMail(Message message, bool saveToSentItems)
@@ -67,10 +85,18 @@ namespace RB.Infrastructure.Services
                 SaveToSentItems = true
             };
 
-            await graphClient.Users[_graphConfiguration.AdminEmailId]
+            try
+            {
+                await graphClient.Users[_graphConfiguration.AdminEmailId]
                              .SendMail
                              .PostAsync(requestBody,
                                         cancellationToken: cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
         }
     }
 }

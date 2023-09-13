@@ -2,7 +2,7 @@
 
 namespace RB.Domain.Entities
 {
-    public class Team : BaseEntity, ICreatedEvent
+    public class Team : BaseEntity, ICreatedEvent, IUpdatedEvent
     {
         public string Name { get; set; }
         public string Description { get; set; }

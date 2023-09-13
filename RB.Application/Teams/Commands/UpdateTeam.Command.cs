@@ -71,6 +71,7 @@ namespace RB.Application.Teams.Commands
             dbTeam.LastUpdatedAt = DateTimeOffset.UtcNow;
             dbTeam.LastUpdatedBy = request.CurrentUser;
 
+            _dbContext.Teams.Update(dbTeam);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
     }

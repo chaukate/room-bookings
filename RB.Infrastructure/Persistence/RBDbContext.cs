@@ -18,6 +18,7 @@ namespace RB.Infrastructure.Persistence
 
         // Arrange all dbsets alphabetically
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Client> Clients { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Team> Teams { get; set; }
