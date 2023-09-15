@@ -30,7 +30,7 @@ namespace RB.Application.Common.Helpers
             {
                 var index = random.Next(0, collection.Count);
                 var choice = random.Next(0, collection[index].Length);
-                stringBuilder.Append(choice);
+                stringBuilder.Append(collection[index][choice]);
             }
 
             return stringBuilder.ToString();
