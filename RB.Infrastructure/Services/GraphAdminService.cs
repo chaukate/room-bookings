@@ -84,19 +84,10 @@ namespace RB.Infrastructure.Services
                 Message = message,
                 SaveToSentItems = true
             };
-
-            try
-            {
-                await graphClient.Users[_graphConfiguration.AdminEmailId]
+            await graphClient.Users[_graphConfiguration.AdminEmailId]
                              .SendMail
                              .PostAsync(requestBody,
                                         cancellationToken: cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            
         }
     }
 }
